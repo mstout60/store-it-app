@@ -5,6 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import FileUploader from "@/components/file-uploader";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -12,11 +15,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { navItems } from "@/contants";
+import { signOutUser } from "@/lib/actions/user.actions";
 import { cn } from "@/lib/utils";
-
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import FileUploader from "@/components/file-uploader";
 
 interface Props {
   ownerId: string;
@@ -100,7 +100,11 @@ const MobileNavigation = ({
           <Separator className="my-5 bg-light-200/20" />
           <div className="flex flex-col justify-between gap-5 pb-5">
             <FileUploader />
-            <Button type="submit" className="mobile-sign-out-button" onClick={() => {}}>
+            <Button
+              type="submit"
+              className="mobile-sign-out-button"
+              onClick={async () => await signOutUser()}
+            >
               <Image
                 src="/assets/icons/logout.svg"
                 alt="logout"

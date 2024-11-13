@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createAccount } from "@/lib/actions/user.actions";
+import { createAccount, signInUser } from "@/lib/actions/user.actions";
 
 type FormType = "sign-in" | "sign-up";
 
@@ -53,17 +53,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
     try {
       const user =
-        // type === "sign-up"
-        //   ? await createAccount({
-        //       fullName: values.fullName || "",
-        //       email: values.email,
-        //     })
-        //   : await signInUser({ email: values.email });
+        type === "sign-up"
+          ? await createAccount({
+              fullName: values.fullName || "",
+              email: values.email,
+            })
+          : await signInUser({ email: values.email });
 
-        await createAccount({
-          fullName: values.fullName || "",
-          email: values.email,
-        });
+      // await createAccount({
+      //   fullName: values.fullName || "",
+      //   email: values.email,
+      // });
 
       setaccountId(user.accountId);
     } catch {
@@ -160,7 +160,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         </form>
       </Form>
       {accountId && (
-        <OTPModel email={form.getValues("email")} accountId={accountId}/>
+        <OTPModel email={form.getValues("email")} accountId={accountId} />
       )}
     </>
   );
