@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import OTPModel from "@/components/otp-model";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -158,7 +159,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
           </div>
         </form>
       </Form>
-      {/* OTP Verification */}
+      {accountId && (
+        <OTPModel email={form.getValues("email")} accountId={accountId}/>
+      )}
     </>
   );
 };
