@@ -4,6 +4,7 @@ import React from "react";
 import Header from "@/components/header";
 import MobileNavigation from "@/components/mobile-navigation";
 import SideBar from "@/components/sidebar";
+import { Toaster } from "@/components/ui/toaster";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -16,9 +17,10 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
       <SideBar {...currentUser} />
       <section className="flex h-full flex-1 flex-col">
         <MobileNavigation {...currentUser} />
-        <Header />
+        <Header userId={currentUser.$id} accountId={currentUser.accountId}/>
         <div className="main-content">{children}</div>
       </section>
+      <Toaster />
     </main>
   );
 };
