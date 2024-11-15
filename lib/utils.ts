@@ -1,3 +1,6 @@
+/* eslint-disable prefer-template */
+/* eslint-disable no-undef */
+import { FileType } from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

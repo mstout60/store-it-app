@@ -41,7 +41,7 @@ export const uploadFile = async ({
       owner: ownerId,
       accountId,
       users: [],
-      buckfileId: bucketFile.$id,
+      bucketFileId: bucketFile.$id,
     };
 
     const newFile = await databases

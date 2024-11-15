@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 "use client"
 
 import { useToast } from "@/hooks/use-toast"
