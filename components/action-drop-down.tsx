@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { Models } from "node-appwrite";
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { actionsDropdownItems } from "@/contants";
+import { renameFile } from "@/lib/actions/file.actions";
 import { constructDownloadUrl } from "@/lib/utils";
 import { ActionType } from "@/types";
 
@@ -35,6 +37,8 @@ const AcgtionDropdown = ({ file }: { file: Models.Document }) => {
   const [name, setName] = useState(file.name);
   const [isLoading, setIsLoading] = useState(false);
 
+  const path = usePathname();
+
   const closeAllModals = () => {
     setIsModalOpen(false);
     setIsDropdownOpen(false);
@@ -44,7 +48,23 @@ const AcgtionDropdown = ({ file }: { file: Models.Document }) => {
     // TODO: setEmails([])
   };
 
-  const handleAction = async () => {};
+  const handleAction = async () => {
+    if (!action) return;
+    setIsLoading(true);
+    let succes = false;
+
+    const actions = {
+      rename: () =>
+        renameFile({ fileId: file.$id, name, extension: file.extension, path }),
+      share: () => console.log("share"),
+      delete: () => console.log("delete"),
+    };
+
+    succes = await actions[action.value as keyof typeof actions]();
+
+    if (succes) closeAllModals();
+    setIsLoading(false);
+  };
 
   const renderDialogContent = () => {
     if (!action) return null;
