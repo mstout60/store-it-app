@@ -1,15 +1,21 @@
 import React from "react";
 
+import { Models } from "node-appwrite";
+
+import Card from "@/components/card";
 import Sort from "@/components/sort";
 import { getFiles } from "@/lib/actions/file.actions";
-import { SearchParamProps } from "@/types";
-import { Models } from "node-appwrite";
-import Card from "@/components/card";
+import { getFileTypesParams } from "@/lib/utils";
+import { FileType, SearchParamProps } from "@/types";
 
-const Page = async ({ params }: SearchParamProps) => {
+const Page = async ({ searchParams, params }: SearchParamProps) => {
   const type = ((await params)?.type as string) || "";
+  const searchText = ((await searchParams)?.query as string) || "";
+  const sort = ((await searchParams)?.sort as string) || "";
 
-  const files = await getFiles();
+  const types = getFileTypesParams(type) as FileType[];
+
+  const files = await getFiles({ types, searchText, sort });
 
   return (
     <div className="page-container">
@@ -28,10 +34,10 @@ const Page = async ({ params }: SearchParamProps) => {
       </section>
       {/* Render the files */}
       {files.total > 0 ? (
-        <section className="file-list"> 
-            {files.documents.map((file:Models.Document) => (
-                <Card key={file.$id} file={file} />
-            ))}
+        <section className="file-list">
+          {files.documents.map((file: Models.Document) => (
+            <Card key={file.$id} file={file} />
+          ))}
         </section>
       ) : (
         <p className="empty-list">No files uploaded</p>
