@@ -5,18 +5,18 @@ import { revalidatePath } from "next/cache";
 import { ID, Models, Query } from "node-appwrite";
 import { InputFile } from "node-appwrite/file";
 
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import { createAdminClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { constructFileUrl, getFileType, parseStringify } from "@/lib/utils";
 import {
   DeleteFileProps,
+  FileType,
   GetFilesProps,
   RenameFileProps,
   UpdateFileUsersProps,
   UploadFileProps,
 } from "@/types";
-
-import { getCurrentUser } from "./user.actions";
 
 const handleError = (error: unknown, message: string) => {
   console.log(error, message);
@@ -115,7 +115,7 @@ export const getFiles = async ({
 
     const queries = createQueries(currentUser, types, searchText, sort, limit);
 
-    console.log({ currentUser, queries });
+    //console.log({ currentUser, queries });
 
     const files = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -123,11 +123,55 @@ export const getFiles = async ({
       queries
     );
 
-    console.log({ files });
+    //console.log({ files });
 
     return parseStringify(files);
   } catch (error) {
     handleError(error, "Failed to get files");
+  }
+};
+
+export const getTotalSpaceUsed = async () => {
+  const { databases } = await createAdminClient();
+
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) throw new Error("User is not authenticated.");
+
+    const files = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesCollectionId,
+      [Query.equal("owner", [currentUser.$id])]
+    );
+
+    const totalSpace = {
+      image: { size: 0, latestDate: "" },
+      document: { size: 0, latestDate: "" },
+      video: { size: 0, latestDate: "" },
+      audio: { size: 0, latestDate: "" },
+      other: { size: 0, latestDate: "" },
+      used: 0,
+      all: 2 * 1024 * 1024 * 1024, // 2GB available bucket storage
+    };
+
+    if (files.total > 0) {
+      files.documents.forEach((file) => {
+        const fileType = file.type as FileType;
+        totalSpace[fileType].size += file.size;
+        totalSpace.used += file.size;
+
+        if (
+          !totalSpace[fileType].latestDate ||
+          new Date(file.$updatedAt) > new Date(totalSpace[fileType].latestDate)
+        ) {
+          totalSpace[fileType].latestDate = file.$updatedAt;
+        }
+      });
+      return parseStringify(totalSpace);
+    }
+  } catch (error) {
+    handleError(error, "Unable to get users file totals");
   }
 };
 
